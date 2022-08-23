@@ -1,31 +1,36 @@
 package events
 
-var broker *Broker
+var _dispatcher = NewDispatcher()
 
-func init() {
-	broker = New("memory", NewMemoryChannel())
+func RegisterChannel(name string, channel BroadcastChannel) {
+	_dispatcher.RegisterChannel(name, channel)
 }
 
-func Publish(topic string, message interface{}) error {
-	return broker.Publish(topic, message)
+func Listen(topic string, listener ...Listener) {
+	_dispatcher.Listen(topic, listener...)
 }
 
-func Subscribe(topic string, receiver MessageReceiver) (*Subscriber, error) {
-	return broker.Subscribe(topic, receiver)
+func UnregisterChannel(name string) {
+	_dispatcher.UnregisterChannel(name)
 }
 
-func Unsubscribe(topic string, receiver *MessageReceiver) error {
-	return broker.Unsubscribe(topic, receiver)
+func Unlisten(topic string, listener *Listener) {
+	_dispatcher.Unlisten(topic, listener)
 }
 
-func Receivers(topic string) []*MessageReceiver {
-	return broker.Receivers(topic)
+func Dispatch(event Event) error {
+	return _dispatcher.Dispatch(event)
 }
 
-func Channel() MessageChannel {
-	return broker.Channel()
+type Event interface {
+	// Topic returns the topic of the event
+	Topic() string
+
+	// BroadcastOnChannels returns the channels to broadcast the event
+	BroadcastOnChannels() []string
+
+	// Payload returns the payload of the event
+	Payload() interface{}
 }
 
-func On(channelName string) MessageChannel {
-	return broker.channels[channelName]
-}
+type Listener func(Event) error
