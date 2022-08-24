@@ -4,4 +4,7 @@ package events
 type BroadcastChannel interface {
 	// Publish a message to a topic
 	Publish(topic string, message interface{}) error
+
+	// Subscribe to a topic
+	Subscribe(topics ...string) error
 }

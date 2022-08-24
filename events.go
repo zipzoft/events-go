@@ -1,6 +1,17 @@
 package events
 
 var _dispatcher = NewDispatcher()
+var _subscriber *Subscriber = nil
+
+func SubscribeOn(channel BroadcastChannel) *Subscriber {
+	_subscriber = &Subscriber{
+		creators:  make([]CreateEvent, 0),
+		listeners: make(map[string][]*Listener),
+		channel:   channel,
+	}
+
+	return _subscriber
+}
 
 func RegisterChannel(name string, channel BroadcastChannel) {
 	_dispatcher.RegisterChannel(name, channel)
@@ -8,6 +19,16 @@ func RegisterChannel(name string, channel BroadcastChannel) {
 
 func Listen(topic string, listener ...Listener) {
 	_dispatcher.Listen(topic, listener...)
+
+	if _subscriber != nil {
+		topics := make([]string, 0)
+
+		for _topic, _ := range _dispatcher.listeners {
+			topics = append(topics, _topic)
+		}
+
+		_subscriber.channel.Subscribe(topics...)
+	}
 }
 
 func UnregisterChannel(name string) {
