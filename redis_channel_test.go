@@ -102,7 +102,9 @@ func TestRedisChannel(t *testing.T) {
 	t.Run("Subscribe", func(t *testing.T) {
 		expectMessage := "test message"
 
-		subscriber := events.SubscribeOn(events.NewRedisChannel(opt))
+		events.RegisterChannel("redis", events.NewRedisChannel(opt))
+
+		subscriber := events.SubscribeOn("redis")
 		subscriber.RegisterEvent(&testEvent1{})
 
 		gotEvent := make(chan events.Event, 1)

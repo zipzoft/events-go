@@ -3,14 +3,18 @@ package events
 var _dispatcher = NewDispatcher()
 var _subscriber *Subscriber = nil
 
-func SubscribeOn(channel BroadcastChannel) *Subscriber {
-	_subscriber = &Subscriber{
-		topics:    make(map[string][]Event),
-		listeners: make(map[string][]*Listener),
-		channel:   channel,
+func SubscribeOn(channelName string) *Subscriber {
+	if channel := _dispatcher.channels[channelName]; channel != nil {
+		_subscriber = &Subscriber{
+			topics:    make(map[string][]Event),
+			listeners: make(map[string][]*Listener),
+			channel:   channel,
+		}
+
+		return _subscriber
 	}
 
-	return _subscriber
+	panic("Channel " + channelName + " not found")
 }
 
 func RegisterChannel(name string, channel BroadcastChannel) {
