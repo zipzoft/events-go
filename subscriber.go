@@ -12,6 +12,12 @@ func (s *Subscriber) RegisterEvent(evt Event) {
 	s.topics[evt.Topic()] = append(s.topics[evt.Topic()], evt)
 }
 
-func (s *Subscriber) Subscribe(topic ...string) error {
-	return s.channel.Subscribe(topic...)
+func (s *Subscriber) Subscribe(topics ...string) error {
+	if len(topics) == 0 {
+		for topic := range s.topics {
+			topics = append(topics, topic)
+		}
+	}
+
+	return s.channel.Subscribe(topics...)
 }
