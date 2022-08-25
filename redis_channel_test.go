@@ -29,6 +29,12 @@ func (evt *testEvent1) Payload() interface{} {
 	return evt.message
 }
 
+func (evt *testEvent1) OnBroadcastReceive(message interface{}) error {
+	evt.message = message.(string)
+
+	return nil
+}
+
 var _ events.Event = (*testEvent2)(nil)
 
 type testEvent2 struct {
@@ -48,6 +54,11 @@ func (evt *testEvent2) Topic() string {
 // Payload implements events.Event
 func (evt *testEvent2) Payload() interface{} {
 	return evt.message
+}
+
+func (evt *testEvent2) OnBroadcastReceive(message interface{}) error {
+	evt.message = message.(string)
+	return nil
 }
 
 func TestRedisChannel(t *testing.T) {
@@ -92,13 +103,7 @@ func TestRedisChannel(t *testing.T) {
 		expectMessage := "test message"
 
 		subscriber := events.SubscribeOn(events.NewRedisChannel(opt))
-		subscriber.BindEvent(func(topic string, message interface{}) events.Event {
-			if topic == "test" {
-				return &testEvent1{message: message.(string)}
-			}
-
-			return nil
-		})
+		subscriber.RegisterEvent(&testEvent1{})
 
 		gotEvent := make(chan events.Event, 1)
 		got := make(chan string, 1)

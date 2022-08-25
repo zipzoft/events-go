@@ -1,15 +1,15 @@
 package events
 
 type Subscriber struct {
-	creators  []CreateEvent
+	topics    map[string][]Event
 	listeners map[string][]*Listener
 	channel   BroadcastChannel
 }
 
 type CreateEvent func(topic string, message interface{}) Event
 
-func (s *Subscriber) BindEvent(creator CreateEvent) {
-	s.creators = append(s.creators, creator)
+func (s *Subscriber) RegisterEvent(evt Event) {
+	s.topics[evt.Topic()] = append(s.topics[evt.Topic()], evt)
 }
 
 func (s *Subscriber) Subscribe(topic ...string) error {

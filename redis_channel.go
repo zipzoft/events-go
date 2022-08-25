@@ -30,10 +30,14 @@ func (channel *RedisChannel) Subscribe(topics ...string) error {
 			topic := msg.Channel
 			message := msg.Payload
 
-			for _, creator := range _subscriber.creators {
-				if evt := creator(topic, message); evt != nil {
-					if evt.Topic() == topic {
-						_dispatcher.Dispatch(evt)
+			for _topic, events := range _subscriber.topics {
+				if _topic == topic {
+					for _, event := range events {
+						event.OnBroadcastReceive(message)
+
+						if err := _dispatcher.Dispatch(event); err != nil {
+							break
+						}
 					}
 				}
 			}

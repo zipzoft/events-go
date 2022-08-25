@@ -5,7 +5,7 @@ var _subscriber *Subscriber = nil
 
 func SubscribeOn(channel BroadcastChannel) *Subscriber {
 	_subscriber = &Subscriber{
-		creators:  make([]CreateEvent, 0),
+		topics:    make(map[string][]Event),
 		listeners: make(map[string][]*Listener),
 		channel:   channel,
 	}
@@ -52,6 +52,9 @@ type Event interface {
 
 	// Payload returns the payload of the event
 	Payload() interface{}
+
+	// OnBroadcastReceive is called when the event is received on a channel
+	OnBroadcastReceive(message interface{}) error
 }
 
 type Listener func(Event) error
