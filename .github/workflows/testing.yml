@@ -23,11 +23,7 @@ jobs:
         with:
           go-version: "${{ matrix.go }}"
       - name: Set up gotestfmt
-        uses: haveyoudebuggedit/gotestfmt-action@v2
-
-      # Alternatively, install using go install
-      - name: Set up gotestfmt
-        run: go install github.com/haveyoudebuggedit/gotestfmt/v2/cmd/gotestfmt@latest
+        uses: GoTestTools/gotestfmt-action@v2
 
       - name: "Setup"
         run: |
